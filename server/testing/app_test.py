@@ -88,10 +88,11 @@ class TestApp:
     def test_updates_body_of_message_in_database(self):
         '''updates the body of a message in the database.'''
         with app.app_context():
-
-            m = Message.query.first()
-            id = m.id
-            body = m.body
+            # Create a message to update
+            test_message = Message(body="Hello 👋", username="Liza")
+            db.session.add(test_message)
+            db.session.commit()
+            id = test_message.id
 
             app.test_client().patch(
                 f'/messages/{id}',
@@ -103,17 +104,17 @@ class TestApp:
             g = Message.query.filter_by(body="Goodbye 👋").first()
             assert(g)
 
-            g.body = body
-            db.session.add(g)
+            db.session.delete(g)
             db.session.commit()
 
     def test_returns_data_for_updated_message_as_json(self):
         '''returns data for the updated message as JSON.'''
         with app.app_context():
-
-            m = Message.query.first()
-            id = m.id
-            body = m.body
+            # Create a message to update
+            test_message = Message(body="Hello 👋", username="Liza")
+            db.session.add(test_message)
+            db.session.commit()
+            id = test_message.id
 
             response = app.test_client().patch(
                 f'/messages/{id}',
@@ -126,8 +127,7 @@ class TestApp:
             assert(response.json["body"] == "Goodbye 👋")
 
             g = Message.query.filter_by(body="Goodbye 👋").first()
-            g.body = body
-            db.session.add(g)
+            db.session.delete(g)
             db.session.commit()
 
     def test_deletes_message_from_database(self):
